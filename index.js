@@ -32,6 +32,7 @@ async function run() {
     await client.connect();
     
     const foodCollection = client.db('foodDB').collection('food');
+    const orderCollection = client.db('productDB').collection('order');
 
     //add food
     app.post('/food', async (req, res) => {
@@ -56,6 +57,15 @@ async function run() {
         res.send(result);
       })
 
+      //posting data to order collection
+      app.post('/order', async (req, res) => {
+        const orderItem = req.body;
+        console.log(orderItem)
+        const result = await orderCollection.insertOne(orderItem);
+        res.send(result);
+      });
+      
+      //getting data from order
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
