@@ -5,7 +5,13 @@ const app = express();
 const port = process.env.PORT || 5200;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+      'http://localhost:5173',
+      
+  ],
+  credentials: true
+}));
 
 console.log(process.env.DB_USER)
 
@@ -22,7 +28,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
+  
     await client.connect();
     
     const foodCollection = client.db('foodDB').collection('food');
@@ -32,9 +38,23 @@ async function run() {
         const newFood = req.body;
         console.log(newFood);
         const result = await foodCollection.insertOne(newFood)
+        res.send(newFood)
+      })
+    
+      //for reading from db 
+      app.get('/food', async (req, res) => {
+        const cursor = foodCollection.find()
+        const result = await cursor.toArray()
         res.send(result)
       })
 
+      //finding single data
+      app.get('/food/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }
+        const result = await foodCollection.findOne(query);
+        res.send(result);
+      })
 
 
     // Send a ping to confirm a successful connection
