@@ -32,7 +32,7 @@ async function run() {
     await client.connect();
     
     const foodCollection = client.db('foodDB').collection('food');
-    const orderCollection = client.db('productDB').collection('order');
+    const orderCollection = client.db('foodDB').collection('order');
 
     //add food
     app.post('/food', async (req, res) => {
@@ -66,6 +66,29 @@ async function run() {
       });
       
       //getting data from order
+      app.get('/order', async (req, res) => {
+        const cursor = orderCollection.find()
+        const result = await cursor.toArray()
+        res.send(result)
+      })
+
+      //for deleting from order
+      app.delete('/order/:itemId', async (req, res) => {
+        try {
+          const itemId = req.params.itemId;
+          const result = await orderCollection.deleteOne({ _id: new ObjectId(itemId) });
+      
+          if (result.deletedCount === 1) {
+           console.log('deletion successful')
+            res.status(204).send(); 
+          } else {
+            res.status(404).json({ error: 'Item not found' });
+          }
+        } catch (error) {
+          console.error('Error deleting item:', error);
+          res.status(500).json({ error: 'Internal server error' });
+        }
+      });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
