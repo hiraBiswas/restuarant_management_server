@@ -64,6 +64,19 @@ async function run() {
         const result = await orderCollection.insertOne(orderItem);
         res.send(result);
       });
+
+      app.get('/top-selling-food', async (req, res) => {
+        const topSellingFood = await foodCollection
+          .find()
+          .sort({ orderCount: -1 }) // Sort in descending order based on orderCount
+          .limit(6)
+          .toArray();
+      
+        res.send(topSellingFood);
+      });
+      
+    
+
       
       //getting data from order
       app.get('/order', async (req, res) => {
